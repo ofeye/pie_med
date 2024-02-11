@@ -63,53 +63,54 @@ def url_to_gif(url,base_url,save_dir):
                     save_all=True, duration=50, loop=0)
 
 
-requested_link='http://pie.med.utoronto.ca/tee/TEE_content/assets/applications/standardViewsHTML5/TEE-HTML5-SV/index.html'
-
-save_path=join(get_work_dir(),'gifs/{}'.format(now()))
-check_folder_exist(save_path)
-
-service = Service(executable_path=join(get_work_dir(),'chromedriver/chromedriver'))
-options = webdriver.ChromeOptions()
-options.add_argument('--headless')
-options.add_argument('--no-sandbox')
-options.add_argument('--disable-dev-shm-usage')
-driver = webdriver.Chrome(service=service, options=options)
-
-# Go to the Google home page
-driver.get(requested_link)
-
-# Access requests via the `requests` attribute
-for request in driver.requests:
-    if request.response:
-        if request.response.headers['Content-Type']=='text/xml':
-            xml_url=request.url,
-
-xml_str = urllib.request.urlopen(xml_url[0])
-tree = ET.parse(xml_str)
-
-jpg_base_arr=[]
-
-for x in tree.findall('./row'):
-    swf_file=x.attrib['swf_spin'].split('/')[-1].split('.')[0]
-    base_str=''
-    for x in swf_file.split('-')[1::]:
-        base_str+=x+'-'
-    base_str=base_str[:-1]
-
-    jpg_base_arr.append(base_str)
-
-link_arr=requested_link.split('/')
-base_url=''
-for x in link_arr[:-1]:
-    base_url+=x+'/'
-base_url+='images/'
-image_url_arr=[]
-
-for x in jpg_base_arr:
-    base_url_x=base_url+x
-    base_url_x+='/spriteSheet_vid.jpg'
-    image_url_arr.append(base_url_x)
-
-for im,base in zip(image_url_arr,jpg_base_arr):
-    save_path_s=join(save_path,'{}.gif'.format(base))
-    url_to_gif(im,requested_link,save_path_s)
+if __name__ == "__main__":
+    requested_link='http://pie.med.utoronto.ca/tee/TEE_content/assets/applications/standardViewsHTML5/TEE-HTML5-SV/index.html'
+    
+    save_path=join(get_work_dir(),'gifs/{}'.format(now()))
+    check_folder_exist(save_path)
+    
+    service = Service(executable_path=join(get_work_dir(),'chromedriver/chromedriver'))
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    driver = webdriver.Chrome(service=service, options=options)
+    
+    # Go to the Google home page
+    driver.get(requested_link)
+    
+    # Access requests via the `requests` attribute
+    for request in driver.requests:
+        if request.response:
+            if request.response.headers['Content-Type']=='text/xml':
+                xml_url=request.url,
+    
+    xml_str = urllib.request.urlopen(xml_url[0])
+    tree = ET.parse(xml_str)
+    
+    jpg_base_arr=[]
+    
+    for x in tree.findall('./row'):
+        swf_file=x.attrib['swf_spin'].split('/')[-1].split('.')[0]
+        base_str=''
+        for x in swf_file.split('-')[1::]:
+            base_str+=x+'-'
+        base_str=base_str[:-1]
+    
+        jpg_base_arr.append(base_str)
+    
+    link_arr=requested_link.split('/')
+    base_url=''
+    for x in link_arr[:-1]:
+        base_url+=x+'/'
+    base_url+='images/'
+    image_url_arr=[]
+    
+    for x in jpg_base_arr:
+        base_url_x=base_url+x
+        base_url_x+='/spriteSheet_vid.jpg'
+        image_url_arr.append(base_url_x)
+    
+    for im,base in zip(image_url_arr,jpg_base_arr):
+        save_path_s=join(save_path,'{}.gif'.format(base))
+        url_to_gif(im,requested_link,save_path_s)
